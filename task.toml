@@ -25,6 +25,6 @@ timeout_sec = 300
 
 [metadata]
 difficulty = "expert"
-category = "能源系统"
+category = "F-能源系统"
 tags = ["Python", "锂离子电池", "EKF", "一阶Thevenin模型"]
 expert_time_estimate = "4h"
