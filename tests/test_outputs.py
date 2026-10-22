@@ -379,8 +379,10 @@ def test_cli_rejects_duplicate_or_descending_timestamps():
         (0.0, 0.3, 3.8, 25.0),
         (0.0, 1.1, 3.7, 25.0),
     ]
-    process, _, _ = _run_cli(bad_rows)
+    process, output_rows, summary = _run_cli(bad_rows)
     assert process.returncode != 0
+    assert output_rows is None
+    assert summary is None
 
 
 def test_cli_rejects_non_numeric_values():
@@ -391,19 +393,25 @@ def test_cli_rejects_non_numeric_values():
             "timestamp_s,current_a,voltage_v,temp_c\n0,0,3.8,25\n1,abc,3.7,25\n",
             encoding="utf-8",
         )
+        out_path = root / "out.csv"
+        summary_path = root / "summary.json"
         process = subprocess.run(
             [
                 sys.executable,
                 "-m",
                 "battery_estimator.cli",
                 str(bad_path),
-                str(root / "out.csv"),
+                str(out_path),
                 "--summary",
-                str(root / "summary.json"),
+                str(summary_path),
             ],
             cwd="/workspace",
             capture_output=True,
             text=True,
             timeout=30,
         )
+        output_exists = out_path.exists()
+        summary_exists = summary_path.exists()
     assert process.returncode != 0
+    assert not output_exists
+    assert not summary_exists
