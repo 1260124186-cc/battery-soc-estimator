@@ -3,22 +3,14 @@ set -u
 
 reward_file=/logs/verifier/reward.txt
 mkdir -p /logs/verifier
+echo 0 > "$reward_file"
+trap 'echo 0 > "$reward_file"; exit 130' INT TERM HUP
 
-write_reward() {
-    chmod 0644 "$reward_file" 2>/dev/null || true
-    printf '%s\n' "$1" > "$reward_file"
-    chmod 0444 "$reward_file"
-}
-
-write_reward 0
-trap 'write_reward 0; exit 130' INT TERM HUP
-
-score="$(cd /workspace && python /tests/check.py)"
-status=$?
-if [ "$status" -eq 0 ] && printf '%s' "$score" | grep -Eq '^(0(\.[0-9]+)?|1(\.0+)?)$'; then
-    write_reward "$score"
+cd /workspace
+if python -m pytest --ctrf /logs/verifier/ctrf.json /tests/test_outputs.py -q; then
+  echo 1 > "$reward_file"
 else
-    write_reward 0
+  echo 0 > "$reward_file"
 fi
 
 trap - INT TERM HUP
