@@ -11,8 +11,10 @@ if ! python -m pip install --user --no-index --find-links /tests/wheels --requir
   exit 0
 fi
 
-cd /workspace
-if python -m pytest --ctrf /logs/verifier/ctrf.json /tests/test_outputs.py -q; then
+# 在 /tests 下用隔离模式运行 pytest：-P 不把 cwd 加入 sys.path，
+# 防止 /workspace 里的同名 pytest.py 等模块劫持测试入口。
+cd /tests
+if python -P -m pytest --ctrf /logs/verifier/ctrf.json /tests/test_outputs.py -q; then
   echo 1 > "$reward_file"
 else
   echo 0 > "$reward_file"

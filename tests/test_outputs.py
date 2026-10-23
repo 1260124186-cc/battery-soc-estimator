@@ -1,6 +1,7 @@
 import csv
 import json
 import math
+import os
 import subprocess
 import sys
 import tempfile
@@ -415,3 +416,20 @@ def test_cli_rejects_non_numeric_values():
     assert process.returncode != 0
     assert not output_exists
     assert not summary_exists
+
+
+def test_workspace_has_no_test_framework_hijack():
+    """校验 /workspace 里没有劫持测试框架的同名模块或入口。"""
+    forbidden = (
+        "pytest.py",
+        "pytest",
+        "conftest.py",
+        "sitecustomize.py",
+        "usercustomize.py",
+        "_pytest",
+        "_pytest.py",
+    )
+    found = [
+        name for name in forbidden if os.path.exists(os.path.join("/workspace", name))
+    ]
+    assert not found, f"/workspace 存在测试框架劫持文件: {found}"
