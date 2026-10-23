@@ -6,7 +6,7 @@ mkdir -p /logs/verifier
 echo 0 > "$reward_file"
 trap 'echo 0 > "$reward_file"; exit 130' INT TERM HUP
 
-if ! python -m pip install --user --require-hashes -r /tests/requirements.txt --quiet; then
+if ! python -m pip install --user --no-index --find-links /tests/wheels --require-hashes -r /tests/requirements.txt --quiet; then
   echo 0 > "$reward_file"
   exit 0
 fi
