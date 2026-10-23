@@ -22,6 +22,7 @@ os = "linux"
 
 [verifier]
 timeout_sec = 300
+user = "root"
 
 [metadata]
 difficulty = "expert"
